@@ -19,11 +19,12 @@ dependencies {
 <pre>
 &lt;uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /&gt;
 </pre>
-4. 在 pubspec.yaml 文件的 dependences 中增加
+4. 由于发布到 pub.dartlng.org 失败，所以引用操作是 在 pubspec.yaml 文件的 dev_dependences 中增加
 <pre>
-  jlocation: ^0.0.01
+  jlocation:
+    path: ../jlocation/
  </pre>
-
+path 指向插件源码路径，直接下载存储就可以了
 
 ## Getting Started
 Example：
