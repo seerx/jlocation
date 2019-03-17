@@ -9,9 +9,11 @@ import android.os.Build;
 import android.os.Bundle;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import cn.xval.plugin.PluginPermissionHelper;
 import io.flutter.plugin.common.EventChannel;
+import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 
 
@@ -89,20 +91,24 @@ public final class JLocation implements EventChannel.StreamHandler {
         }
     }
 
+    private Map<String, Double> generateResult(Location location, boolean isLast) {
+        HashMap<String, Double> loc = new HashMap<>();
+        loc.put("last", isLast ? 1.0 : 0.0);
+        loc.put("latitude", location.getLatitude());
+        loc.put("longitude", location.getLongitude());
+        loc.put("accuracy", (double) location.getAccuracy());
+        loc.put("altitude", location.getAltitude());
+        loc.put("speed", (double) location.getSpeed());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            loc.put("speed_accuracy", (double) location.getSpeedAccuracyMetersPerSecond());
+        }
+        loc.put("heading", (double) location.getBearing());
+        return loc;
+    }
+
     public void onLocate(Location location, boolean useLast) {
         if (location != null) {
-            HashMap<String, Double> loc = new HashMap<>();
-            loc.put("last", useLast ? 1.0 : 0.0);
-            loc.put("latitude", location.getLatitude());
-            loc.put("longitude", location.getLongitude());
-            loc.put("accuracy", (double) location.getAccuracy());
-            loc.put("altitude", location.getAltitude());
-            loc.put("speed", (double) location.getSpeed());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                loc.put("speed_accuracy", (double) location.getSpeedAccuracyMetersPerSecond());
-            }
-            loc.put("heading", (double) location.getBearing());
-
+            Map<String, Double> loc = generateResult(location, useLast);
             if (mEvents != null) {
                 mEvents.success(loc);
             }
@@ -122,12 +128,53 @@ public final class JLocation implements EventChannel.StreamHandler {
 
     public void reStartListen() {
         if (mEvents != null) {
-            if (mLocationListener != null) {
-                mLocationManager.removeUpdates(mLocationListener);
-                mLocationListener = null;
-            }
+            stopListen();
             startLocationListen();
         }
+    }
+
+    public void stopListen() {
+        if (mLocationListener != null) {
+            mLocationManager.removeUpdates(mLocationListener);
+            mLocationListener = null;
+        }
+    }
+
+    public void getLocation(final MethodChannel.Result result) {
+        if (! mPermission.checkPermissions(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            mPermission.requestPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
+            return;
+        }
+
+        LocationListener listener = new LocationListener() {
+            private boolean returned = false;
+            @Override
+            public void onLocationChanged(Location location) {
+                if (location != null && ! returned) {
+                    returned = true;
+                    Map<String, Double> loc = generateResult(location, false);
+                    result.success(loc);
+                    mLocationManager.removeUpdates(this);
+                }
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+            }
+        };
+
+        mLocationManager.requestLocationUpdates(PROVIDER,
+                500,
+                1,
+                listener);
     }
 
     public void responseError(String errTtile, String errMessage, Object o) {
@@ -139,9 +186,6 @@ public final class JLocation implements EventChannel.StreamHandler {
     @Override
     public void onCancel(Object o) {
         mEvents = null;
-        if (mLocationListener != null) {
-            mLocationManager.removeUpdates(mLocationListener);
-            mLocationListener = null;
-        }
+        stopListen();
     }
 }

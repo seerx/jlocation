@@ -35,27 +35,34 @@ public class JLocationUtil implements MethodChannel.MethodCallHandler  {
                 result.error("PERMISSION_DENIED", "The user explicitly denied the use of location services for this app or location services are currently disabled in Settings.", null);
             }
         }
-        if ("setProperty".equals(call.method)) {
-            // 初始化
-            if (call.hasArgument("minTime")) {
-                int minTime = call.argument("minTime");
-                mPlugin.getLocation().setMinTime((long) minTime);
-            }
-            else {
-                mPlugin.getLocation().setMinTime(null);
-            }
-
-            if (call.hasArgument("minDistance")) {
-                double minDistance = call.argument("minDistance");
-                mPlugin.getLocation().setMinDistance((float) minDistance);
-            }
-            else {
-                mPlugin.getLocation().setMinDistance(null);
-            }
-
-            mPlugin.getLocation().reStartListen();
+        else if ("stopListen".equals(call.method)) {
+            mPlugin.getLocation().stopListen();
             result.success(1);
         }
+        else if ("getLocation".equals(call.method)) {
+            mPlugin.getLocation().getLocation(result);
+        }
+//        else if ("setProperty".equals(call.method)) {
+//            // 初始化
+//            if (call.hasArgument("minTime")) {
+//                int minTime = call.argument("minTime");
+//                mPlugin.getLocation().setMinTime((long) minTime);
+//            }
+//            else {
+//                mPlugin.getLocation().setMinTime(null);
+//            }
+//
+//            if (call.hasArgument("minDistance")) {
+//                double minDistance = call.argument("minDistance");
+//                mPlugin.getLocation().setMinDistance((float) minDistance);
+//            }
+//            else {
+//                mPlugin.getLocation().setMinDistance(null);
+//            }
+//
+//            mPlugin.getLocation().reStartListen();
+//            result.success(1);
+//        }
         else {
             result.notImplemented();
         }
