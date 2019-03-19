@@ -1,8 +1,8 @@
 name: jlocation
-description: A new Flutter plugin.
+description: A Location Flutter plugin.
 version: 0.0.1
-author:hyb
-homepage:
+author: seerx <wisenow@163.com>
+homepage: https://github.com/seerx/jlocation
 
 environment:
   sdk: ">=2.1.0 <3.0.0"

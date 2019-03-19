@@ -1,6 +1,7 @@
 package cn.xval.jlocation;
 
 import android.Manifest;
+import android.util.Log;
 
 import cn.xval.plugin.PluginPermissionHelper;
 import io.flutter.plugin.common.MethodCall;
@@ -28,6 +29,7 @@ public class JLocationUtil implements MethodChannel.MethodCallHandler  {
 
     @Override
     public void onMethodCall(MethodCall call, MethodChannel.Result result) {
+//        Log.i("xloc", call.method);
         if (call.method.equals("hasPermission")) {
             if(mPermission.checkPermissions(Manifest.permission.ACCESS_FINE_LOCATION)) {
                 result.success(1);
@@ -40,6 +42,7 @@ public class JLocationUtil implements MethodChannel.MethodCallHandler  {
             result.success(1);
         }
         else if ("getLocation".equals(call.method)) {
+//            Log.i("xloc", "getLocation");
             mPlugin.getLocation().getLocation(result);
         }
 //        else if ("setProperty".equals(call.method)) {

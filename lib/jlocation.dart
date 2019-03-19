@@ -56,12 +56,14 @@ class Jlocation {
     return _onLocationChanged;
   }
 
-  Future<void> setProperty(int minTime, double minDistance) async {
-    int res = await _channel.invokeMethod("setProperty", {
-      "minTime": minTime, "minDistance": minDistance
-    });
+  Future<bool> stopListen() =>
+    _channel.invokeMethod('stopListen').then((result) => result == 1);
 
-    print(res);
+  Future<LocationData> getLocation() {
+    _channel.invokeMethod("getLocation")
+      .then((result) {
+        return LocationData.fromMap(result.cast<String, double>());
+    });
   }
 
 //  static Future<String> get platformVersion async {

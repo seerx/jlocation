@@ -7,6 +7,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +44,7 @@ public final class JLocation implements EventChannel.StreamHandler {
         PluginRegistry.Registrar registrar = plugin.getRegistrar();
 
         mContext = registrar.activity();
-        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+
         this.mPermission = plugin.getPermission();
 
         mEventChannel = new EventChannel(registrar.messenger(), STREAM_CHANNEL_NAME);
@@ -60,6 +61,7 @@ public final class JLocation implements EventChannel.StreamHandler {
     }
 
     public void startLocationListen() {
+        mLocationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 //        mListener = myLocationListener;
         if (mLocationListener == null) {
             mLocationListener = new LocationListener() {
@@ -87,7 +89,8 @@ public final class JLocation implements EventChannel.StreamHandler {
             mLocationManager.requestLocationUpdates(PROVIDER,
                     minTime == null ? MIN_TIME : minTime,
                     minDistance == null ? MIN_DISTANCE : minDistance,
-                    mLocationListener);
+                    mLocationListener,
+                    mContext.getMainLooper());
         }
     }
 
@@ -136,6 +139,7 @@ public final class JLocation implements EventChannel.StreamHandler {
     public void stopListen() {
         if (mLocationListener != null) {
             mLocationManager.removeUpdates(mLocationListener);
+            mLocationManager = null;
             mLocationListener = null;
         }
     }
@@ -145,16 +149,21 @@ public final class JLocation implements EventChannel.StreamHandler {
             mPermission.requestPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
             return;
         }
+//        Log.i("xloc", "getLocation");
+        final LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
 
         LocationListener listener = new LocationListener() {
             private boolean returned = false;
             @Override
             public void onLocationChanged(Location location) {
+//                Log.i("xloc", "onLocationChanged");
                 if (location != null && ! returned) {
+//                    Log.i("xloc", "location != null");
                     returned = true;
                     Map<String, Double> loc = generateResult(location, false);
+//                    Log.i("xloc", String.format("%f, %f", location.getLatitude(), location.getLongitude()));
                     result.success(loc);
-                    mLocationManager.removeUpdates(this);
+                    locationManager.removeUpdates(this);
                 }
             }
 
@@ -171,10 +180,8 @@ public final class JLocation implements EventChannel.StreamHandler {
             }
         };
 
-        mLocationManager.requestLocationUpdates(PROVIDER,
-                500,
-                1,
-                listener);
+        locationManager.requestLocationUpdates(PROVIDER,
+                1000, 5, listener, mContext.getMainLooper());
     }
 
     public void responseError(String errTtile, String errMessage, Object o) {
