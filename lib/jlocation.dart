@@ -59,12 +59,16 @@ class Jlocation {
   Future<bool> stopListen() =>
     _channel.invokeMethod('stopListen').then((result) => result == 1);
 
-  Future<JLocData> getLocation() {
-    _channel.invokeMethod("getLocation")
-      .then((result) {
-        return JLocData.fromMap(result.cast<String, double>());
-    });
-  }
+  Future<JLocData> getLocation() => _channel
+      .invokeMethod('getLocation')
+      .then((result) => JLocData.fromMap(result.cast<String, double>()));
+
+//  Future<JLocData> getLocation() {
+//    _channel.invokeMethod("getLocation")
+//      .then((result) {
+//        return JLocData.fromMap(result.cast<String, double>());
+//    });
+//  }
 
 //  static Future<String> get platformVersion async {
 //    final String version = await _channel.invokeMethod('getPlatformVersion');
