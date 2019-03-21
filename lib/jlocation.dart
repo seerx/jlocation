@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-class LocationData {
+class JLocData {
   final bool last;
   final double latitude;
   final double longitude;
@@ -11,7 +11,7 @@ class LocationData {
   final double speed;
   final double speedAccuracy;
 
-  LocationData._(
+  JLocData._(
       this.last,
       this.latitude,
       this.longitude,
@@ -21,9 +21,9 @@ class LocationData {
       this.speedAccuracy,
       );
 
-  factory LocationData.fromMap(Map<String, double> dataMap) {
+  factory JLocData.fromMap(Map<String, double> dataMap) {
     bool last = dataMap["last"] == 1.0;
-    return LocationData._(
+    return JLocData._(
       last,
       dataMap['latitude'],
       dataMap['longitude'],
@@ -36,7 +36,7 @@ class LocationData {
 }
 
 class Jlocation {
-  Stream<LocationData> _onLocationChanged;
+  Stream<JLocData> _onLocationChanged;
 
   static const MethodChannel _channel = const MethodChannel('xval.cn/jlocation');
   static const EventChannel _stream = const EventChannel('xval.cn/jlocationstream');
@@ -45,12 +45,12 @@ class Jlocation {
       _channel.invokeMapMethod('hasPermission').then((result) => result ==1);
 
   /// Returns a stream of location information.
-  Stream<LocationData> onLocationChanged() {
+  Stream<JLocData> onLocationChanged() {
     if (_onLocationChanged == null) {
       _onLocationChanged = _stream
           .receiveBroadcastStream()
-          .map<LocationData>(
-              (element) => LocationData.fromMap(element.cast<String, double>())
+          .map<JLocData>(
+              (element) => JLocData.fromMap(element.cast<String, double>())
           );
     }
     return _onLocationChanged;
@@ -59,10 +59,10 @@ class Jlocation {
   Future<bool> stopListen() =>
     _channel.invokeMethod('stopListen').then((result) => result == 1);
 
-  Future<LocationData> getLocation() {
+  Future<JLocData> getLocation() {
     _channel.invokeMethod("getLocation")
       .then((result) {
-        return LocationData.fromMap(result.cast<String, double>());
+        return JLocData.fromMap(result.cast<String, double>());
     });
   }
 
