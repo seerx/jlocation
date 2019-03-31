@@ -2,7 +2,7 @@
 
 不使用 google 服务，不用注册第三方 key，可以直接获取设备 GPS 信息的 flutter 插件。
 
-Android 使用，需要做以下修改
+在 Android中 使用，需要做以下修改
 1. 在 gradle.properties 文件中增加
 <pre>
 android.enableJetifier=true
@@ -24,6 +24,14 @@ dependencies {
   jlocation:
     git: https://github.com/seerx/jlocation.git
  </pre>
+
+在 iOS 中使用，需要在 Runner 的 info.plist 中添加一下两项
+<pre>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Can I use the gps location please?</string>
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>Can I use the gps location please?</string>
+</pre>
 
 ## Getting Started
 Example：
