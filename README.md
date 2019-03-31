@@ -1,6 +1,6 @@
 # jlocation
 
-不使用 google 服务，不用注册第三方 key，可以直接获取设备 GPS 信息的 flutter 插件。暂时只支持 Android,后续考虑支持 iOS。
+不使用 google 服务，不用注册第三方 key，可以直接获取设备 GPS 信息的 flutter 插件。
 
 Android 使用，需要做以下修改
 1. 在 gradle.properties 文件中增加
