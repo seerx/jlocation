@@ -26,7 +26,7 @@ dependencies {
  </pre>
 
 在 iOS 中使用，需要在 Runner 的 info.plist 中添加一下两项
-<pre>
+&lt;pre>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Can I use the gps location please?</string>
     <key>NSLocationAlwaysUsageDescription</key>
